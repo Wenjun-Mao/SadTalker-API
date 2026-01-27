@@ -5,5 +5,5 @@ requires-python = ">=3.10"
 dependencies = []
 
 [build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build"]
+build-backend = "uv_build"
