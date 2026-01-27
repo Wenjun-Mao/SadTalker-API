@@ -1,0 +1,36 @@
+This is a fork from OpenTalker/SadTalker:main, the purpose of this project is to write a FastAPI endpoint to turn this into a backend API. The output will be put into an "output" folder.
+We will be just developping the code locally but the acutal delopy will be on a different server, so do not try to install any dependencies locally. But we can add new dependencies to the requirements.txt.
+
+
+The API endpoint takes 3 arguments:
+driven_audio: a path to the driven audio, could be a PATH object or a str
+source_image: a path to the source image, could be a PATH object or a str
+option: "full" or "crop"
+
+Option 1, full
+This will be using these arguments below, except the driven_audio and source_image will be from the post call arguments
+```
+python inference.py --driven_audio ./input/1.mp3 \
+                    --source_image ./input/1.jpg \
+                    --still \
+                    --preprocess full \
+                    --enhancer gfpgan
+```
+
+Option 2, crop
+This will be using these arguments below, except the driven_audio and source_image will be from the post call arguments
+```
+python inference.py --driven_audio ./input/1.mp3 \
+                    --source_image ./input/1.jpg \
+                    --enhancer gfpgan
+```
+
+As you can see, what we need to do will be almost entirely based on refactoring the inference.py.
+However, to make the endpoint more efficient, we would:
+## 1.1 avoid the need to load the model everytime there is a request, so we will load the models needed upon starting the API endpoint.
+## 1.2 We will always need to have 'cuda', if 'cuda' is not available, don't even start the service.
+## 2. We will use pydantic to verify the input, and if the input is fine, then we will immediately return the post call with a "1" right after to show the request has been well received. If the input is bad, we will return a useful error message.
+## 3. About save path, currently the `--result_dir` flag, we will need to refactor the code, so the output mp4 files will just be put into an "output" folder. The actual output file will be named with a timestamp along with a short hash or random string (just to avoid dumplications). If there are any files that are generated in the middle, these will be permanently deleted.
+## 4. We will never be doing TTS, the audio will always be provided in the post all.
+
+In order to make sure we use the most up to date API in FastAPI, always use context7

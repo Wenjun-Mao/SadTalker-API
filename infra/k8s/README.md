@@ -1,0 +1,1 @@
+Kubernetes manifests for deployment.
