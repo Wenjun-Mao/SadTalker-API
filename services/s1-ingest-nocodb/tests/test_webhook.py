@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app import app
+from ingest_nocodb.app import app
 
 
 client = TestClient(app)
