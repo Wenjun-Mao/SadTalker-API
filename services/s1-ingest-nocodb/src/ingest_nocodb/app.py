@@ -6,7 +6,14 @@ from typing import Any, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
+from ingest_nocodb.settings import get_settings
+
 app = FastAPI(title="s1-ingest-nocodb")
+
+
+@app.on_event("startup")
+async def startup_check() -> None:
+    _ = get_settings()
 
 
 class NocoDbRow(BaseModel):

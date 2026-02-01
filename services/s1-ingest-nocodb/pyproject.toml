@@ -7,6 +7,7 @@ dependencies = [
   "dramatiq[rabbitmq]>=2.0.1",
   "fastapi==0.126.0",
   "pydantic>=2.7.0",
+  "pydantic-settings>=2.2.1",
   "uvicorn==0.30.0",
 ]
 

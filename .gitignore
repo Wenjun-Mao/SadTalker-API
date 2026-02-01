@@ -164,7 +164,7 @@ gfpgan/*
 checkpoints/*
 assets/*
 results/*
-Dockerfile
+# Dockerfile
 start_docker.sh
 start.sh
 
@@ -172,3 +172,6 @@ checkpoints
 
 # Mac
 .DS_Store
+
+# Docker secrets
+infra/docker-compose/secrets/*

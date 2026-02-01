@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+
+  s1-ingest-nocodb:
+    build:
+      context: ../../services/s1-ingest-nocodb
+    ports:
+      - "8111:8111"
+    environment:
+      - S1_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    secrets:
+      - nocodb_api_key
+      - nocodb_base_url
+    depends_on:
+      - rabbitmq
+
+  s2-tts-voice:
+    build:
+      context: ../../services/s2-tts-voice
+    profiles:
+      - s2
+
+  s4-broll-selector:
+    build:
+      context: ../../services/s4-broll-selector
+    profiles:
+      - s4
+
+  s5-video-compositor:
+    build:
+      context: ../../services/s5-video-compositor
+    profiles:
+      - s5
+
+  s6-storage-uploader:
+    build:
+      context: ../../services/s6-storage-uploader
+    profiles:
+      - s6
+
+  s7-nocodb-updater:
+    build:
+      context: ../../services/s7-nocodb-updater
+    profiles:
+      - s7
+
+secrets:
+  nocodb_api_key:
+    file: ./secrets/nocodb_api_key
+  nocodb_base_url:
+    file: ./secrets/nocodb_base_url
