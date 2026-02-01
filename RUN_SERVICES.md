@@ -8,7 +8,7 @@ s1-ingest-nocodb
 - Install deps and lock (first time):
   uv sync
 - Start the API:
-  uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 8001
+  uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 8111
 - Run tests:
   uv run pytest
 
