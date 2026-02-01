@@ -16,4 +16,4 @@ RUN uv sync --no-dev
 
 EXPOSE 5101
 
-CMD ["uv", "run", "uvicorn", "ingest_nocodb.app:app", "--host", "0.0.0.0", "--port", "8111"]
+CMD ["uv", "run", "uvicorn", "ingest_nocodb.app:app", "--host", "0.0.0.0", "--port", "5101"]

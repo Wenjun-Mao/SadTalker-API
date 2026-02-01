@@ -26,7 +26,7 @@ Local dev example
    - S1_RABBITMQ_URL
    - S1_NOCODB_API_KEY
    - S1_NOCODB_BASE_URL
-3) Run: uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 8111
+3) Run: uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 5101
 
 Docker Compose example
 
@@ -34,13 +34,13 @@ services:
   s1-ingest-nocodb:
     build: ./services/s1-ingest-nocodb
     ports:
-      - "8111:8111"
+      - "5101:5101"
     environment:
       - S1_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     secrets:
       - nocodb_api_key
       - nocodb_base_url
-    command: uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 8111
+    command: uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 5101
 
 secrets:
   nocodb_api_key:
