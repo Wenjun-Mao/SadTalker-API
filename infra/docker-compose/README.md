@@ -22,6 +22,7 @@ How Docker secrets work (Compose)
 - Secrets are files mounted at /run/secrets/<name> inside the container.
 - This repo reads secrets via pydantic-settings with secrets_dir=/run/secrets.
 - Each secret file should contain only the value (no quotes, no key names).
+- Secret files are unprefixed (e.g., nocodb_api_key), while env vars use the S1_ prefix.
 
 Example
 - /run/secrets/nocodb_api_key contains: abcd1234

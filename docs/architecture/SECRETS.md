@@ -16,6 +16,10 @@ How it works with pydantic-settings
   - /run/secrets/nocodb_api_key
   - /run/secrets/nocodb_base_url
 
+Prefix note
+- Env vars use the S1_ prefix (e.g., S1_NOCODB_API_KEY).
+- Secret files are unprefixed (e.g., /run/secrets/nocodb_api_key).
+
 Local dev example
 1) Copy .env.example to .env at repo root or service directory.
 2) Fill values for:
