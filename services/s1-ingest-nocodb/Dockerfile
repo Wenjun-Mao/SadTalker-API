@@ -14,6 +14,6 @@ COPY src /app/src
 # Install runtime dependencies
 RUN uv sync --no-dev
 
-EXPOSE 5101
+EXPOSE 7101
 
-CMD ["uv", "run", "uvicorn", "ingest_nocodb.app:app", "--host", "0.0.0.0", "--port", "5101"]
+CMD ["uv", "run", "uvicorn", "ingest_nocodb.app:app", "--host", "0.0.0.0", "--port", "7101"]

@@ -10,7 +10,7 @@ services:
     build:
       context: ../../services/s1-ingest-nocodb
     ports:
-      - "5101:5101"
+      - "7101:7101"
     environment:
       - S1_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     secrets:

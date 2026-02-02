@@ -12,7 +12,7 @@ s1-ingest-nocodb
   copy ../.env.example to .env and fill values
 - Start the API:
   cd services/s1-ingest-nocodb
-  uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 5101
+  uv run uvicorn ingest_nocodb.app:app --host 0.0.0.0 --port 7101
 - Run tests:
   uv run pytest
 
