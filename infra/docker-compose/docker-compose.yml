@@ -19,35 +19,41 @@ services:
     depends_on:
       - rabbitmq
 
-  s2-tts-voice:
+  s2-download-mp4:
     build:
-      context: ../../services/s2-tts-voice
+      context: ../../services/s2-download-mp4
     profiles:
       - s2
 
-  s4-broll-selector:
+  s3-tts-voice:
     build:
-      context: ../../services/s4-broll-selector
+      context: ../../services/s3-tts-voice
     profiles:
-      - s4
+      - s3
 
-  s5-video-compositor:
+  s5-broll-selector:
     build:
-      context: ../../services/s5-video-compositor
+      context: ../../services/s5-broll-selector
     profiles:
       - s5
 
-  s6-storage-uploader:
+  s6-video-compositor:
     build:
-      context: ../../services/s6-storage-uploader
+      context: ../../services/s6-video-compositor
     profiles:
       - s6
 
-  s7-nocodb-updater:
+  s7-storage-uploader:
     build:
-      context: ../../services/s7-nocodb-updater
+      context: ../../services/s7-storage-uploader
     profiles:
       - s7
+
+  s8-nocodb-updater:
+    build:
+      context: ../../services/s8-nocodb-updater
+    profiles:
+      - s8
 
 secrets:
   nocodb_api_key:

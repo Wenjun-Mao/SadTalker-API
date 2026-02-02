@@ -28,6 +28,16 @@ class Settings(BaseSettings):
         description="NocoDB base URL, e.g. https://nocodb.example.com",
         validation_alias=AliasChoices("S1_NOCODB_BASE_URL", "nocodb_base_url"),
     )
+    downstream_queue: str = Field(
+        "s2-download-mp4",
+        description="Dramatiq queue for downstream service",
+        validation_alias=AliasChoices("S1_DOWNSTREAM_QUEUE", "downstream_queue"),
+    )
+    downstream_actor: str = Field(
+        "s2_download_mp4.process",
+        description="Dramatiq actor name for downstream service",
+        validation_alias=AliasChoices("S1_DOWNSTREAM_ACTOR", "downstream_actor"),
+    )
 
 
 def get_settings() -> Settings:

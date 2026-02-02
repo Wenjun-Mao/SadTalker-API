@@ -17,4 +17,12 @@ s1-ingest-nocodb
   uv run pytest
 
 Other services
-- Currently placeholders. Add an app entrypoint first, then run with uvicorn similarly.
+- s2-download-mp4
+- s3-tts-voice
+- s4-sadtalker (legacy SadTalker service)
+- s5-broll-selector
+- s6-video-compositor
+- s7-storage-uploader
+- s8-nocodb-updater
+
+These are placeholders unless noted. Add an app entrypoint first, then run with uvicorn similarly.

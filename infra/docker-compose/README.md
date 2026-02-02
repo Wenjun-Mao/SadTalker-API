@@ -12,11 +12,12 @@ Quick start
 	docker compose up --build
 
 Optional services (profiles)
-- s2-tts-voice: docker compose --profile s2 up --build
-- s4-broll-selector: docker compose --profile s4 up --build
-- s5-video-compositor: docker compose --profile s5 up --build
-- s6-storage-uploader: docker compose --profile s6 up --build
-- s7-nocodb-updater: docker compose --profile s7 up --build
+- s2-download-mp4: docker compose --profile s2 up --build
+- s3-tts-voice: docker compose --profile s3 up --build
+- s5-broll-selector: docker compose --profile s5 up --build
+- s6-video-compositor: docker compose --profile s6 up --build
+- s7-storage-uploader: docker compose --profile s7 up --build
+- s8-nocodb-updater: docker compose --profile s8 up --build
 
 How Docker secrets work (Compose)
 - Secrets are files mounted at /run/secrets/<name> inside the container.

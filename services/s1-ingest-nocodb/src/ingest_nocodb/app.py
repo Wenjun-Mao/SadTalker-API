@@ -6,6 +6,7 @@ from typing import Any, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
+from ingest_nocodb.messaging import enqueue_downstream, init_broker
 from ingest_nocodb.settings import get_settings
 
 app = FastAPI(title="s1-ingest-nocodb")
@@ -13,7 +14,8 @@ app = FastAPI(title="s1-ingest-nocodb")
 
 @app.on_event("startup")
 async def startup_check() -> None:
-    _ = get_settings()
+    settings = get_settings()
+    init_broker(settings)
 
 
 class NocoDbRow(BaseModel):
@@ -61,5 +63,31 @@ class WebhookAck(BaseModel):
 async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
     if not payload.data.rows:
         raise HTTPException(status_code=400, detail="No rows provided in payload.")
+    settings = get_settings()
+
+    for row in payload.data.rows:
+        missing_fields = [
+            name
+            for name, value in {
+                "Title": row.title,
+                "url": row.url,
+                "content": row.content,
+                "originaltext": row.original_text,
+            }.items()
+            if not value
+        ]
+        if missing_fields:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Row {row.record_id} missing fields: {', '.join(missing_fields)}",
+            )
+
+        enqueue_downstream(
+            settings,
+            title=row.title,
+            url=row.url,
+            content=row.content,
+            original_text=row.original_text,
+        )
 
     return WebhookAck(ok=True, received_rows=len(payload.data.rows))
