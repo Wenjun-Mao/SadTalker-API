@@ -21,6 +21,7 @@ def init_broker(settings: Settings) -> RabbitmqBroker:
 
 def enqueue_downstream(
     settings: Settings,
+    record_id: int,
     title: str,
     url: str,
     content: str,
@@ -30,7 +31,7 @@ def enqueue_downstream(
     message = dramatiq.Message(
         queue_name=settings.downstream_queue,
         actor_name=settings.downstream_actor,
-        args=[title, url, content, original_text],
+        args=[record_id, title, url, content, original_text],
         kwargs={},
         options={},
     )

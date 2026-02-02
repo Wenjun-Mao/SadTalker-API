@@ -84,6 +84,7 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
 
         enqueue_downstream(
             settings,
+            record_id=row.record_id,
             title=row.title,
             url=row.url,
             content=row.content,
