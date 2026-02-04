@@ -70,15 +70,15 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
         raise HTTPException(status_code=400, detail="No rows provided in payload.")
     settings = get_settings()
 
+    if settings.debug_log_payload:
+        logger.bind(payload=payload.model_dump()).info("Received webhook request")
+
     for row in payload.data.rows:
         if settings.debug_log_payload:
             logger.bind(
                 record_id=row.record_id,
-                title=row.title,
-                url=row.url,
-                content_preview=(row.content or "")[:200],
-                originaltext_preview=(row.original_text or "")[:200],
-            ).info("Received row payload")
+                row=row.model_dump(),
+            ).info("Processing row")
         missing_fields = [
             name
             for name, value in {
@@ -108,6 +108,13 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
                 record_id=row.record_id,
                 queue=settings.downstream_queue,
                 actor=settings.downstream_actor,
+                args=[
+                    row.record_id,
+                    row.title,
+                    row.url,
+                    row.content,
+                    row.original_text,
+                ],
             ).info("Enqueued downstream message")
 
     return WebhookAck(ok=True, received_rows=len(payload.data.rows))

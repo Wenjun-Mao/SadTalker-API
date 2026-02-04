@@ -17,6 +17,19 @@ from download_mp4.settings import Settings, get_settings
 _broker: Optional[RabbitmqBroker] = None
 
 
+def _startup() -> None:
+    try:
+        settings = get_settings()
+        init_broker(settings)
+        if settings.debug_log_payload:
+            logger.bind(
+                queue=os.getenv("S2_QUEUE", "s2-download-mp4"),
+            ).info("Worker initialized")
+    except Exception:
+        logger.exception("Worker initialization failed")
+        raise
+
+
 def init_broker(settings: Settings) -> RabbitmqBroker:
     global _broker
     if _broker is None:
@@ -47,6 +60,9 @@ def _request_douyin_download_url(settings: Settings, source_url: str) -> str:
         response = client.post(settings.api_url, headers=headers, json=body)
         response.raise_for_status()
         payload = response.json()
+
+    if settings.debug_log_payload:
+        logger.bind(response_payload=payload).info("External API response")
 
     douyin_download_url = _extract_douyin_download_url(payload)
     if not douyin_download_url:
@@ -83,7 +99,7 @@ def _enqueue_downstream(
     douyin_download_url: str,
     douyin_video_path: str,
 ) -> None:
-    broker = init_broker(settings)
+    broker = dramatiq.get_broker()
     message = dramatiq.Message(
         queue_name=settings.downstream_queue,
         actor_name=settings.downstream_actor,
@@ -111,14 +127,16 @@ def process(
     original_text: str,
 ) -> None:
     settings = get_settings()
-    init_broker(settings)
     if settings.debug_log_payload:
         logger.bind(
             record_id=record_id,
-            title=title,
-            url=url,
-            content_preview=(content or "")[:200],
-            originaltext_preview=(original_text or "")[:200],
+            args={
+                "record_id": record_id,
+                "title": title,
+                "url": url,
+                "content": content,
+                "original_text": original_text,
+            },
         ).info("Received job")
 
     try:
@@ -143,10 +161,17 @@ def process(
         if settings.debug_log_payload:
             logger.bind(
                 record_id=record_id,
-                douyin_download_url=douyin_download_url,
-                douyin_video_path=douyin_video_path,
                 queue=settings.downstream_queue,
                 actor=settings.downstream_actor,
+                args=[
+                    record_id,
+                    title,
+                    url,
+                    content,
+                    original_text,
+                    douyin_download_url,
+                    douyin_video_path,
+                ],
             ).info("Completed job")
     except Exception:
         logger.bind(
@@ -158,3 +183,6 @@ def process(
     finally:
         # Ensure all filesystem buffers are flushed to disk (Linux/Unix only; no-op on Windows)
         os.sync() if hasattr(os, "sync") else None
+
+
+_startup()
