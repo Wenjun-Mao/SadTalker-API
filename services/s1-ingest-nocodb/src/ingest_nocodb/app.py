@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, List, Optional
 
+from loguru import logger
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -69,6 +71,14 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
     settings = get_settings()
 
     for row in payload.data.rows:
+        if settings.debug_log_payload:
+            logger.bind(
+                record_id=row.record_id,
+                title=row.title,
+                url=row.url,
+                content_preview=(row.content or "")[:200],
+                originaltext_preview=(row.original_text or "")[:200],
+            ).info("Received row payload")
         missing_fields = [
             name
             for name, value in {
@@ -93,5 +103,11 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
             content=row.content,
             original_text=row.original_text,
         )
+        if settings.debug_log_payload:
+            logger.bind(
+                record_id=row.record_id,
+                queue=settings.downstream_queue,
+                actor=settings.downstream_actor,
+            ).info("Enqueued downstream message")
 
     return WebhookAck(ok=True, received_rows=len(payload.data.rows))

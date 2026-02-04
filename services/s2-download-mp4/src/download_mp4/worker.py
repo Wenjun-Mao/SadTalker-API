@@ -9,6 +9,7 @@ from uuid import uuid4
 import dramatiq
 import httpx
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
+from loguru import logger
 
 from download_mp4.settings import Settings, get_settings
 
@@ -111,20 +112,49 @@ def process(
 ) -> None:
     settings = get_settings()
     init_broker(settings)
+    if settings.debug_log_payload:
+        logger.bind(
+            record_id=record_id,
+            title=title,
+            url=url,
+            content_preview=(content or "")[:200],
+            originaltext_preview=(original_text or "")[:200],
+        ).info("Received job")
 
-    douyin_download_url = _request_douyin_download_url(settings, url)
-    douyin_video_path = _download_mp4(douyin_download_url, settings.output_dir, record_id)
+    try:
+        douyin_download_url = _request_douyin_download_url(settings, url)
+        douyin_video_path = _download_mp4(
+            douyin_download_url,
+            settings.output_dir,
+            record_id,
+        )
 
-    _enqueue_downstream(
-        settings,
-        record_id=record_id,
-        title=title,
-        url=url,
-        content=content,
-        original_text=original_text,
-        douyin_download_url=douyin_download_url,
-        douyin_video_path=douyin_video_path,
-    )
+        _enqueue_downstream(
+            settings,
+            record_id=record_id,
+            title=title,
+            url=url,
+            content=content,
+            original_text=original_text,
+            douyin_download_url=douyin_download_url,
+            douyin_video_path=douyin_video_path,
+        )
 
-    # Ensure all filesystem buffers are flushed to disk (Linux/Unix only; no-op on Windows)
-    os.sync() if hasattr(os, "sync") else None
+        if settings.debug_log_payload:
+            logger.bind(
+                record_id=record_id,
+                douyin_download_url=douyin_download_url,
+                douyin_video_path=douyin_video_path,
+                queue=settings.downstream_queue,
+                actor=settings.downstream_actor,
+            ).info("Completed job")
+    except Exception:
+        logger.bind(
+            record_id=record_id,
+            title=title,
+            url=url,
+        ).exception("Failed job")
+        raise
+    finally:
+        # Ensure all filesystem buffers are flushed to disk (Linux/Unix only; no-op on Windows)
+        os.sync() if hasattr(os, "sync") else None

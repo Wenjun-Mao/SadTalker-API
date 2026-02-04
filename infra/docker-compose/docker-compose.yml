@@ -15,6 +15,7 @@ services:
       - rabbitmq_url
       - nocodb_api_key
       - nocodb_base_url
+      - debug_log_payload
     restart: always
     depends_on:
       - rabbitmq
@@ -27,6 +28,7 @@ services:
     secrets:
       - rabbitmq_url
       - video_parse_api_token
+      - debug_log_payload
     restart: always
     depends_on:
       - rabbitmq
@@ -70,3 +72,5 @@ secrets:
     file: ./secrets/nocodb_base_url
   video_parse_api_token:
     file: ./secrets/video_parse_api_token
+  debug_log_payload:
+    file: ./secrets/debug_log_payload

@@ -52,6 +52,15 @@ class Settings(BaseSettings):
         description="Dramatiq actor name for downstream service",
         validation_alias=AliasChoices("S2_DOWNSTREAM_ACTOR", "downstream_actor"),
     )
+    debug_log_payload: bool = Field(
+        False,
+        description="Enable verbose logging of incoming args and outputs",
+        validation_alias=AliasChoices(
+            "DEBUG_LOG_PAYLOAD",
+            "debug_log_payload",
+            "S2_DEBUG_LOG_PAYLOAD",
+        ),
+    )
 
 
 def get_settings() -> Settings:
