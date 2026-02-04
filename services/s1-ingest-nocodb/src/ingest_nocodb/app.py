@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import Any, List, Optional
 
@@ -71,14 +72,18 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
     settings = get_settings()
 
     if settings.debug_log_payload:
-        logger.bind(payload=payload.model_dump()).info("Received webhook request")
+        logger.info(
+            "Received webhook request:\n{}",
+            json.dumps(payload.model_dump(), indent=2, default=str),
+        )
 
     for row in payload.data.rows:
         if settings.debug_log_payload:
-            logger.bind(
-                record_id=row.record_id,
-                row=row.model_dump(),
-            ).info("Processing row")
+            logger.info(
+                "Processing row {}:\n{}",
+                row.record_id,
+                json.dumps(row.model_dump(), indent=2, default=str),
+            )
         missing_fields = [
             name
             for name, value in {
@@ -104,17 +109,16 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
             original_text=row.original_text,
         )
         if settings.debug_log_payload:
-            logger.bind(
-                record_id=row.record_id,
-                queue=settings.downstream_queue,
-                actor=settings.downstream_actor,
-                args=[
-                    row.record_id,
-                    row.title,
-                    row.url,
-                    row.content,
-                    row.original_text,
-                ],
-            ).info("Enqueued downstream message")
+            msg_args = {
+                "record_id": row.record_id,
+                "title": row.title,
+                "url": row.url,
+                "content": row.content,
+                "original_text": row.original_text,
+            }
+            logger.info(
+                "Enqueued downstream message:\n{}",
+                json.dumps(msg_args, indent=2, default=str),
+            )
 
     return WebhookAck(ok=True, received_rows=len(payload.data.rows))

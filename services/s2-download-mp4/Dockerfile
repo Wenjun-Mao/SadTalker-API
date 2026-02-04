@@ -9,4 +9,4 @@ COPY src /app/src
 
 RUN uv sync --no-dev
 
-CMD ["/bin/sh", "-c", "uv run dramatiq download_mp4.worker -Q ${S2_QUEUE:-s2-download-mp4}"]
+CMD ["/bin/sh", "-c", "uv run dramatiq download_mp4.worker -Q ${S2_QUEUE:-s2-download-mp4} -p 1 -t 1"]
