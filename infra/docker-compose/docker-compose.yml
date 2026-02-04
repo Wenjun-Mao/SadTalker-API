@@ -11,19 +11,25 @@ services:
       context: ../../services/s1-ingest-nocodb
     ports:
       - "7101:7101"
-    environment:
-      - S1_RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     secrets:
+      - rabbitmq_url
       - nocodb_api_key
       - nocodb_base_url
+    restart: always
     depends_on:
       - rabbitmq
 
   s2-download-mp4:
     build:
       context: ../../services/s2-download-mp4
-    profiles:
-      - s2
+    environment:
+      - S2_QUEUE=s2-download-mp4
+    secrets:
+      - rabbitmq_url
+      - video_parse_api_token
+    restart: always
+    depends_on:
+      - rabbitmq
 
   s3-tts-voice:
     build:
@@ -56,7 +62,11 @@ services:
       - s8
 
 secrets:
+  rabbitmq_url:
+    file: ./secrets/rabbitmq_url
   nocodb_api_key:
     file: ./secrets/nocodb_api_key
   nocodb_base_url:
     file: ./secrets/nocodb_base_url
+  video_parse_api_token:
+    file: ./secrets/video_parse_api_token

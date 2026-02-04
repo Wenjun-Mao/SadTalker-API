@@ -12,6 +12,9 @@ from ingest_nocodb.settings import get_settings
 app = FastAPI(title="s1-ingest-nocodb")
 
 
+# Sanity check: ensure settings (from env vars and secrets) and broker are initialized at startup.
+# This will fail fast if config or RabbitMQ connection is invalid,
+# so deployment errors are caught early (not on first request).
 @app.on_event("startup")
 async def startup_check() -> None:
     settings = get_settings()
