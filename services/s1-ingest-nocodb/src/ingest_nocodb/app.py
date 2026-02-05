@@ -11,7 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from ingest_nocodb.messaging import enqueue_downstream, init_broker
+from ingest_nocodb.messaging import enqueue_downstream, enqueue_ping, init_broker
 from ingest_nocodb.settings import get_settings
 
 app = FastAPI(title="s1-ingest-nocodb")
@@ -75,6 +75,13 @@ class NocoDbWebhookPayload(BaseModel):
 class WebhookAck(BaseModel):
     ok: bool
     received_rows: int
+
+
+@app.post("/ping")
+async def ping() -> dict[str, str]:
+    settings = get_settings()
+    enqueue_ping(settings)
+    return {"message": "Ping enqueued to s2"}
 
 
 @app.post("/webhook", response_model=WebhookAck)

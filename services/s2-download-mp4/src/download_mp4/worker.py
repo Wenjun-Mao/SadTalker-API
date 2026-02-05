@@ -11,34 +11,21 @@ import httpx
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
 from loguru import logger
 
-from download_mp4.settings import Settings, get_settings
+from download_mp4.settings import get_settings
 
+# 1. Initialize Settings and Broker at the top level
+# This ensures that when Dramatiq imports this module, the broker is already set
+# and any actors defined below will correctly bind to it.
+settings = get_settings()
 
-_broker: Optional[RabbitmqBroker] = None
+# Mask password in URL for safe logging
+_url_parts = settings.rabbitmq_url.split("@")
+_masked_url = _url_parts[-1] if len(_url_parts) > 1 else settings.rabbitmq_url
 
+logger.info(f"Initializing s2-download-mp4 worker (broker={_masked_url}, queue={settings.downstream_queue})")
 
-def _startup() -> None:
-    try:
-        settings = get_settings()
-        init_broker(settings)
-        # Mask password in URL for safe logging
-        url_parts = settings.rabbitmq_url.split("@")
-        masked_url = url_parts[-1] if len(url_parts) > 1 else settings.rabbitmq_url
-        logger.bind(
-            queue=os.getenv("S2_QUEUE", "s2-download-mp4"),
-            broker_host=masked_url,
-        ).info("Worker initialized and connected to broker")
-    except Exception:
-        logger.exception("Worker initialization failed")
-        raise
-
-
-def init_broker(settings: Settings) -> RabbitmqBroker:
-    global _broker
-    if _broker is None:
-        _broker = RabbitmqBroker(url=settings.rabbitmq_url)
-        dramatiq.set_broker(_broker)
-    return _broker
+broker = RabbitmqBroker(url=settings.rabbitmq_url)
+dramatiq.set_broker(broker)
 
 
 def _extract_douyin_download_url(payload: dict[str, Any]) -> Optional[str]:
@@ -55,7 +42,7 @@ def _extract_douyin_download_url(payload: dict[str, Any]) -> Optional[str]:
     return None
 
 
-def _request_douyin_download_url(settings: Settings, source_url: str) -> str:
+def _request_douyin_download_url(settings: Any, source_url: str) -> str:
     headers = {"Content-Type": "application/json"}
     body = {"url": source_url, "token": settings.api_token}
     timeout = httpx.Timeout(settings.request_timeout_s)
@@ -96,7 +83,7 @@ def _download_mp4(douyin_download_url: str, output_dir: str, record_id: int) -> 
 
 
 def _enqueue_downstream(
-    settings: Settings,
+    settings: Any,
     record_id: int,
     title: str,
     url: str,
@@ -124,6 +111,11 @@ def _enqueue_downstream(
     broker.enqueue(message)
 
 
+@dramatiq.actor(actor_name="s2_download_mp4.ping", queue_name="s2-download-mp4")
+def ping() -> None:
+    logger.info("PONG! s2-download-mp4 worker is alive and reachable.")
+
+
 @dramatiq.actor(
     actor_name="s2_download_mp4.process",
     queue_name="s2-download-mp4",
@@ -145,7 +137,7 @@ def process(
             "content": content,
             "original_text": original_text,
         }
-        logger.info("Received job:\n{}", json.dumps(args, indent=2, default=str))
+        logger.info("Received job details:\n{}", json.dumps(args, indent=2, default=str))
 
     try:
         douyin_download_url = _request_douyin_download_url(settings, url)
@@ -191,4 +183,5 @@ def process(
         os.sync() if hasattr(os, "sync") else None
 
 
-_startup()
+# Log registered actors for verification
+logger.info(f"Worker started with actors: {[a.actor_name for a in broker.actors.values()]}")

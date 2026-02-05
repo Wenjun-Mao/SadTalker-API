@@ -19,6 +19,18 @@ def init_broker(settings: Settings) -> RabbitmqBroker:
     return _broker
 
 
+def enqueue_ping(settings: Settings) -> None:
+    broker = init_broker(settings)
+    message = dramatiq.Message(
+        queue_name="s2-download-mp4",
+        actor_name="s2_download_mp4.ping",
+        args=[],
+        kwargs={},
+        options={},
+    )
+    broker.enqueue(message)
+
+
 def enqueue_downstream(
     settings: Settings,
     record_id: int,
