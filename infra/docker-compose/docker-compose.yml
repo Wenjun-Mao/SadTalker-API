@@ -25,6 +25,8 @@ services:
       context: ../../services/s2-download-mp4
     environment:
       - S2_QUEUE=s2-download-mp4
+    volumes:
+      - ../../data:/data
     # profiles:
     #   - s2
     secrets:
@@ -38,30 +40,40 @@ services:
   s3-tts-voice:
     build:
       context: ../../services/s3-tts-voice
+    volumes:
+      - ../../data:/data
     profiles:
       - s3
 
   s5-broll-selector:
     build:
       context: ../../services/s5-broll-selector
+    volumes:
+      - ../../data:/data
     profiles:
       - s5
 
   s6-video-compositor:
     build:
       context: ../../services/s6-video-compositor
+    volumes:
+      - ../../data:/data
     profiles:
       - s6
 
   s7-storage-uploader:
     build:
       context: ../../services/s7-storage-uploader
+    volumes:
+      - ../../data:/data
     profiles:
       - s7
 
   s8-nocodb-updater:
     build:
       context: ../../services/s8-nocodb-updater
+    volumes:
+      - ../../data:/data
     profiles:
       - s8
 
