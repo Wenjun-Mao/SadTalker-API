@@ -6,13 +6,25 @@ from typing import Any, List, Optional
 
 from loguru import logger
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from ingest_nocodb.messaging import enqueue_downstream, init_broker
 from ingest_nocodb.settings import get_settings
 
 app = FastAPI(title="s1-ingest-nocodb")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    error_details = exc.errors()
+    logger.error("Pydantic validation failed for request to {}: {}", request.url.path, error_details)
+    return JSONResponse(
+        status_code=422,
+        content={"detail": error_details},
+    )
 
 
 # Sanity check: ensure settings (from env vars and secrets) and broker are initialized at startup.
@@ -95,9 +107,11 @@ async def webhook(payload: NocoDbWebhookPayload) -> WebhookAck:
             if not value
         ]
         if missing_fields:
+            error_msg = f"Row {row.record_id} missing mandatory fields: {', '.join(missing_fields)}"
+            logger.error(error_msg)
             raise HTTPException(
                 status_code=400,
-                detail=f"Row {row.record_id} missing fields: {', '.join(missing_fields)}",
+                detail=error_msg,
             )
 
         enqueue_downstream(

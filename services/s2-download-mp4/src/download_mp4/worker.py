@@ -21,14 +21,13 @@ def _startup() -> None:
     try:
         settings = get_settings()
         init_broker(settings)
-        if settings.debug_log_payload:
-            # Mask password in URL for safe logging
-            url_parts = settings.rabbitmq_url.split("@")
-            masked_url = url_parts[-1] if len(url_parts) > 1 else settings.rabbitmq_url
-            logger.bind(
-                queue=os.getenv("S2_QUEUE", "s2-download-mp4"),
-                broker_host=masked_url,
-            ).info("Worker initialized and connected to broker")
+        # Mask password in URL for safe logging
+        url_parts = settings.rabbitmq_url.split("@")
+        masked_url = url_parts[-1] if len(url_parts) > 1 else settings.rabbitmq_url
+        logger.bind(
+            queue=os.getenv("S2_QUEUE", "s2-download-mp4"),
+            broker_host=masked_url,
+        ).info("Worker initialized and connected to broker")
     except Exception:
         logger.exception("Worker initialization failed")
         raise
@@ -125,7 +124,10 @@ def _enqueue_downstream(
     broker.enqueue(message)
 
 
-@dramatiq.actor(actor_name="s2_download_mp4.process")
+@dramatiq.actor(
+    actor_name="s2_download_mp4.process",
+    queue_name="s2-download-mp4",
+)
 def process(
     record_id: int,
     title: str,
@@ -133,6 +135,7 @@ def process(
     content: str,
     original_text: str,
 ) -> None:
+    logger.info(f"Received job for record_id={record_id}")
     settings = get_settings()
     if settings.debug_log_payload:
         args = {

@@ -15,7 +15,7 @@ def test_webhook_ok(monkeypatch):
     monkeypatch.setenv("S1_RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
     monkeypatch.setenv("S1_NOCODB_API_KEY", "test")
     monkeypatch.setenv("S1_NOCODB_BASE_URL", "https://example.com")
-    monkeypatch.setattr(messaging, "enqueue_downstream", _noop_enqueue)
+    monkeypatch.setattr("ingest_nocodb.app.enqueue_downstream", _noop_enqueue)
     payload = {
         "type": "records.after.trigger",
         "id": "074d261a-66c4-4c05-99af-3ffb6b964f7a",
@@ -53,7 +53,7 @@ def test_webhook_empty_rows(monkeypatch):
     monkeypatch.setenv("S1_RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
     monkeypatch.setenv("S1_NOCODB_API_KEY", "test")
     monkeypatch.setenv("S1_NOCODB_BASE_URL", "https://example.com")
-    monkeypatch.setattr(messaging, "enqueue_downstream", _noop_enqueue)
+    monkeypatch.setattr("ingest_nocodb.app.enqueue_downstream", _noop_enqueue)
     payload = {
         "type": "records.after.trigger",
         "id": "074d261a-66c4-4c05-99af-3ffb6b964f7a",
@@ -74,7 +74,7 @@ def test_webhook_missing_fields(monkeypatch):
     monkeypatch.setenv("S1_RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
     monkeypatch.setenv("S1_NOCODB_API_KEY", "test")
     monkeypatch.setenv("S1_NOCODB_BASE_URL", "https://example.com")
-    monkeypatch.setattr(messaging, "enqueue_downstream", _noop_enqueue)
+    monkeypatch.setattr("ingest_nocodb.app.enqueue_downstream", _noop_enqueue)
 
     payload = {
         "type": "records.after.trigger",
@@ -99,4 +99,4 @@ def test_webhook_missing_fields(monkeypatch):
 
     response = client.post("/webhook", json=payload)
     assert response.status_code == 400
-    assert "missing fields" in response.json()["detail"]
+    assert "missing mandatory fields: originaltext" in response.json()["detail"]

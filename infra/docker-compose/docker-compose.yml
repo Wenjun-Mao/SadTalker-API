@@ -25,6 +25,8 @@ services:
       context: ../../services/s2-download-mp4
     environment:
       - S2_QUEUE=s2-download-mp4
+    # profiles:
+    #   - s2
     secrets:
       - rabbitmq_url
       - video_parse_api_token
