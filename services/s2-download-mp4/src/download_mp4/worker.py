@@ -31,11 +31,11 @@ dramatiq.set_broker(broker)
 def _extract_douyin_download_url(payload: dict[str, Any]) -> Optional[str]:
     if isinstance(payload.get("data"), dict):
         data = payload["data"]
-        for key in ("url", "download_url", "video_url", "videoUrl"):
+        for key in ("url", "download_url", "video_url", "videoUrl", "videoUrls"):
             value = data.get(key)
             if isinstance(value, str) and value:
                 return value
-    for key in ("url", "download_url", "video_url", "videoUrl"):
+    for key in ("url", "download_url", "video_url", "videoUrl", "videoUrls"):
         value = payload.get(key)
         if isinstance(value, str) and value:
             return value
