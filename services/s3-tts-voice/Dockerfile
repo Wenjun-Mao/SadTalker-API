@@ -9,4 +9,4 @@ COPY src /app/src
 
 RUN uv sync --no-dev
 
-CMD ["sleep", "infinity"]
+CMD ["/bin/sh", "-c", "uv run dramatiq tts_voice.worker -Q ${S3_QUEUE:-s3-tts-voice} -p 1 -t 1"]

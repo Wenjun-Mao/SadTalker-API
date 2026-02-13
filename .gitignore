@@ -176,5 +176,5 @@ checkpoints
 # Docker secrets
 infra/docker-compose/secrets/*
 
-GEMINI.md
+# GEMINI.md
 data/*

@@ -42,11 +42,11 @@ services:
       context: ../../services/s3-tts-voice
     volumes:
       - ../../data:/data
-    profiles:
-      - s3
+    # profiles:
+    #   - s3
     secrets:
       - rabbitmq_url
-      - tts_api_key
+      - tts_api_token
       - debug_log_payload
 
   s5-broll-selector:
@@ -90,7 +90,7 @@ secrets:
     file: ./secrets/nocodb_base_url
   video_parse_api_token:
     file: ./secrets/video_parse_api_token
-  tts_api_key:
-    file: ./secrets/tts_api_key
+  tts_api_token:
+    file: ./secrets/tts_api_token
   debug_log_payload:
     file: ./secrets/debug_log_payload
