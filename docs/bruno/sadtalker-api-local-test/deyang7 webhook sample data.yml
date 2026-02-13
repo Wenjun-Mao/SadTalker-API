@@ -1,0 +1,45 @@
+info:
+  name: deyang7 webhook sample data
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: https://deyang7-5103.wanyouwan.cn:5101/webhook
+  body:
+    type: json
+    data: |-
+      {
+        "type": "records.after.trigger",
+        "id": "4d3cb49f-4aef-44be-b6df-26c62d3597ab",
+        "version": "v3",
+        "data": {
+          "table_id": "murmwwnt5ukvp7i",
+          "table_name": "创意素材",
+          "rows": [
+            {
+              "Id": 1,
+              "CreatedAt": "2026-02-13T02:28:01.182Z",
+              "UpdatedAt": "2026-02-13T02:28:01.182Z",
+              "Title": "Sample Text",
+              "url": "Sample Text",
+              "content": "Sample Text",
+              "originaltext": "Sample Text",
+              "image1": "Sample Text",
+              "image2": "Sample Text",
+              "image3": "Sample Text",
+              "image4": "Sample Text",
+              "image5": "Sample Text",
+              "fengmianimage": "Sample Text",
+              "chengpinurl": "Sample Text"
+            }
+          ]
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

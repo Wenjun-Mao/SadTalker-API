@@ -1,0 +1,45 @@
+info:
+  name: deyang7 webhook real data
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: https://deyang7-5103.wanyouwan.cn:5101/webhook
+  body:
+    type: json
+    data: |-
+      {
+        "type": "records.after.trigger",
+        "id": "4d3cb49f-4aef-44be-b6df-26c62d3597ab",
+        "version": "v3",
+        "data": {
+          "table_id": "murmwwnt5ukvp7i",
+          "table_name": "创意素材",
+          "rows": [
+            {
+              "Id": 1,
+              "CreatedAt": "2026-02-13T02:28:01.182Z",
+              "UpdatedAt": "2026-02-13T02:28:01.182Z",
+              "Title": "程昱平民强队阵容讲解",
+              "url": "https://v.douyin.com/Hv3TCDwWCaM/",
+              "content": "各位玩家朋友们，大家好！今天我们要聊的是三国志战略版中的一位传奇人物——程昱。作为远古四大法王之一，程昱以其能打真伤和禁疗的独特能力而闻名。然而，在当前的版本中，程昱似乎并不那么受欢迎，这是为什么呢？原来，程昱的战法发动概率较低，这使得他在实战中的表现不够稳定。但是，程昱有一个秘密武器——奇制胜兵书。这本兵书可以大幅提升程昱的稳定性，让他在战场上更加可靠。接下来，我将为大家详细介绍几个适合程昱的强队配置：第一个阵容是程昱飞熊骑。这个阵容由曹操、程昱和锋矢阵飞熊军组成。曹操的加成完全填补了程昱30%的减伤，同时太尉的援护体系也为程昱提供了额外的保护。飞熊军的高额奶量也能补充不少输出，使得这个阵容非常强大。第二个阵容是荀攸五谋骑。荀攸能够移除增益效果，提升战法概率，并且还有输出能力，非常适合与程昱搭配。程昱作为主将，带上文武增伤，再搭配飞熊军和深藏若虚，可以有效防止爆头。副将方面，贾诩走行一阵是最强选择，也可以选择荀彧提供减伤。第三个阵容是三势程昱，特别适合S赛季和刚进PK玩家的骑兵队。太史慈配合许攸的破防，能让程昱打出更高的第二段输出。以上就是本期视频的全部内容，感谢大家的观看！如果你有更多关于程昱的搭配心得，欢迎在评论区分享交流",
+              "originaltext": "Sample Text",
+              "image1": "Sample Text",
+              "image2": "Sample Text",
+              "image3": "Sample Text",
+              "image4": "Sample Text",
+              "image5": "Sample Text",
+              "fengmianimage": "Sample Text",
+              "chengpinurl": "Sample Text"
+            }
+          ]
+        }
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -44,6 +44,10 @@ services:
       - ../../data:/data
     profiles:
       - s3
+    secrets:
+      - rabbitmq_url
+      - tts_api_key
+      - debug_log_payload
 
   s5-broll-selector:
     build:
@@ -86,5 +90,7 @@ secrets:
     file: ./secrets/nocodb_base_url
   video_parse_api_token:
     file: ./secrets/video_parse_api_token
+  tts_api_key:
+    file: ./secrets/tts_api_key
   debug_log_payload:
     file: ./secrets/debug_log_payload
